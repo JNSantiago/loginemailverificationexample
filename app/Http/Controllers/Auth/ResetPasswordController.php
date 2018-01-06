@@ -36,4 +36,14 @@ class ResetPasswordController extends Controller
     {
         $this->middleware('guest');
     }
+
+    protected function sendResetResponse($response)
+    {
+        if(!$this->guard()->user()->hasVerifiedEmail()) {
+            $this->guard()->logout();
+            return redirect('/login')->withInfo('Senha alterada com sucesso. Por favor verifiqeu o seu email');
+        }
+        return redirect($this->redirectPath())
+                            ->with('status', trans($response));
+    }
 }

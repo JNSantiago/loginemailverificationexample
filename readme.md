@@ -64,3 +64,30 @@ class VerificationController extends Controller
 Route::get('/verify/token/{token}', 'Auth\VerificationController@verify')->name('auth.verify'); 
 Route::get('/verify/resend', 'Auth\VerificationController@resend')->name('auth.verify.resend');
 ```
+
+### Alterar o auth controller
+
+```php
+// RegisterController
+// Deslogar o usuario após o cadastro
+protected function registered(Request $request, $user)
+{
+    $this->guard()->logout();
+
+    return redirect('/login')->withInfo('Please verify your email');
+}
+```
+
+```php
+// Garantir que o usuario nao ira se logar caso nao tenha realizado a verificação de login
+protected function authenticated(Request $request, $user)
+{
+    if(!$user->hasVerifiedEmail()) {
+        $this->guard()->logout();
+
+        return redirect('/login')
+            ->withError('Please activate your account. <a href="' . route('auth.verify.resend') . '?email=' . $user->email .'">Resend?</a>');
+    }
+}
+```
+
