@@ -239,3 +239,23 @@ To verify your account, visit the following link. <br> <br>
 
 <a href="{{ route('auth.verify', $token) }}">Verify now</a>
 ```
+
+### Verificando o usuario
+```php
+// no arquivo Controllers/auth/VerificationController.php
+public function verify(VerificationToken $token)
+    {
+        $token->user()->update([
+            'verified' => true
+        ]);
+
+        $token->delete();
+
+        // Uncomment the following lines if you want to login the user 
+        // directly upon email verification
+        // Auth::login($token->user);
+        // return redirect('/home');
+
+        return redirect('/login')->withInfo('Email verification succesful. Please login again');
+    }
+```
