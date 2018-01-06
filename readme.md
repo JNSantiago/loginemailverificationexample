@@ -1,36 +1,33 @@
 ### Adicionar coluna de verificação na migração de criar tabela de usuarios
 
-´´´php
+```php
 $table->boolean('verified')->default(false);
-´´´
+```
 
 ### Adicionar tabela verification_tokens
 
-´´´php
+```php
 php artisan make:migration create_verification_tokens_table
-´´´
 
-´´´php
 $table->integer('user_id')->unsigned()->index();
 $table->string('token');
 $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-´´´
 
-´´´php
+
 php artisan migrate
-´´´
+```
 
 ### Adicionar relacionamentos
 
-´´´php
+```php
 //User model
 public function verificationToken()
 {
     return $this->hasOne(VerificationToken::class);
 }
-´´´
+```
 
-´´´php
+```php
 //VerificationToken model
 
 public function user()
@@ -42,5 +39,28 @@ public function getRouteKeyName()
 {
 	return 'token';
 }
-´´´
+```
 
+### Configurando o controller de verificação e as rotas
+
+```php
+php artisan make:controller VerificationController
+
+class VerificationController extends Controller
+{
+    public function verify(VerificationToken $token)
+    {
+    	//
+    }
+
+    public function resend(Request $request)
+    {
+    	//
+    }
+}
+```
+
+```php
+Route::get('/verify/token/{token}', 'Auth\VerificationController@verify')->name('auth.verify'); 
+Route::get('/verify/resend', 'Auth\VerificationController@resend')->name('auth.verify.resend');
+```
