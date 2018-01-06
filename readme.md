@@ -123,3 +123,31 @@ public function boot()
     });
 }
 ```
+
+### Criar um evento UserRegistered
+
+```php
+//gerar um event basico
+php artisan event:generate
+```
+
+```php
+// Criar na pasta Events
+use App\User;
+
+class UserRegistered
+{
+    use SerializesModels;
+    public $user;
+
+    /**
+     * Create a new event instance.
+     *
+     * @return void
+     */
+    public function __construct(User $user)
+    {
+        $this->user = $user;
+    }
+}
+```
