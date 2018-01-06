@@ -91,3 +91,35 @@ protected function authenticated(Request $request, $user)
 }
 ```
 
+```php
+// Deslogar o usuário caso o mesmo solicite trocar senha e ainda nao houver verificado o email
+protected function sendResetResponse($response)
+{
+    if(!$this->guard()->user()->hasVerifiedEmail()) {
+        $this->guard()->logout();
+        return redirect('/login')->withInfo('Password changed successfully. Please verify your email');
+    }
+    return redirect($this->redirectPath())
+                        ->with('status', trans($response));
+}
+```
+
+### Registrar um Service Provider para Eloquent Events
+
+```php
+php artisan make:provider EloquentEventServiceProvider
+```
+
+```php
+public function boot()
+{
+    User::created(function($user) {
+
+        $token = $user->verificationToken()->create([
+            'token' => bin2hex(random_bytes(32))
+        ]);
+
+        event(new UserRegistered($user));
+    });
+}
+```
