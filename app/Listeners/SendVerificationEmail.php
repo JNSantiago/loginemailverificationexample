@@ -6,7 +6,7 @@ use App\Events\Event;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
-class EventListener
+class SendVerificationEmail
 {
     /**
      * Create the event listener.
@@ -26,6 +26,6 @@ class EventListener
      */
     public function handle(Event $event)
     {
-        //
+        Mail::to($event->user)->send(new SendVerificationToken($event->user->verificationToken));
     }
 }

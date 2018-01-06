@@ -172,3 +172,45 @@ class UserRequestedVerificationEmail
 }
 ```
 
+### Criar um listener
+
+```php
+//Na pasta Listeners
+
+class SendVerificationEmail
+{
+    /**
+     * Create the event listener.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        //
+    }
+
+    /**
+     * Handle the event.
+     *
+     * @param  Event  $event
+     * @return void
+     */
+    public function handle(Event $event)
+    {
+        Mail::to($event->user)->send(new SendVerificationToken($event->user->verificationToken));
+    }
+}
+```
+
+```php
+// Inserir no array: $listen do Proveiders/EventServiceProvider 
+protected $listen = [
+    'App\Events\UserRegistered' => [
+        'App\Listeners\SendVerificationEmail',
+    ],
+    'App\Events\UserRequestedVerificationEmail' => [
+        'App\Listeners\SendVerificationEmail',
+    ],
+];
+
+```
