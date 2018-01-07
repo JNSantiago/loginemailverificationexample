@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use App\User;
+use App\Events\UserRegistered;
 
 class EloquentEventServiceProvider extends ServiceProvider
 {

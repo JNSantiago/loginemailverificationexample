@@ -3,14 +3,19 @@
 namespace App\Http\Controllers\Auth;
 
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use App\User;
+use App\VerificationToken;
+use App\Auth;
+use App\Events\UserRequestedVerificationEmail;
 
 class VerificationController extends Controller
 {
     public function verify(VerificationToken $token)
     {
-    	$token->user()->update([
-			'verified' => true
-		]);
+    	$user = User::find($token->user_id);
+    	$user->verified = true;
+    	$user->save();
 
 		$token->delete();
 
@@ -24,6 +29,14 @@ class VerificationController extends Controller
 
     public function resend(Request $request)
     {
-    	
+    	$user = User::byEmail($request->email)->firstOrFail();
+
+	    if($user->hasVerifiedEmail()) {
+	        return redirect('/home');
+	    }
+
+	    event(new UserRequestedVerificationEmail($user));
+
+	    return redirect('/login')->withInfo('Verification email resent. Please check your inbox');
     }
 }

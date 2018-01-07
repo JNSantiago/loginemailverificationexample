@@ -1,3 +1,9 @@
+### Gerar a autenticação do Laravel
+```php
+php artisan make:auth
+
+```
+
 ### Adicionar coluna de verificação na migração de criar tabela de usuarios
 
 ```php
@@ -24,6 +30,16 @@ php artisan migrate
 public function verificationToken()
 {
     return $this->hasOne(VerificationToken::class);
+}
+
+public function hasVerifiedEmail()
+{
+    return $this->verified;
+}
+
+public static function byEmail($email)
+{
+    return static::where('email', $email);
 }
 ```
 
@@ -195,7 +211,7 @@ class SendVerificationEmail
      * @param  Event  $event
      * @return void
      */
-    public function handle(Event $event)
+    public function handle($event)
     {
         Mail::to($event->user)->send(new SendVerificationToken($event->user->verificationToken));
     }
@@ -222,7 +238,9 @@ php artisan make:mail SendVerificationToken
 ```
 
 ```php
-public function __construct()
+public $token;
+
+public function __construct(VerificationToken $token)
 {
     $this->token = $token;
 }
@@ -257,5 +275,23 @@ public function verify(VerificationToken $token)
         // return redirect('/home');
 
         return redirect('/login')->withInfo('Email verification succesful. Please login again');
+    }
+```
+
+### Reenviar verificação de email
+
+```php
+// no arquivo Controllers/auth/VerificationController.php
+public function resend(Request $request)
+    {
+        $user = User::byEmail($request->email)->firstOrFail();
+
+        if($user->hasVerifiedEmail()) {
+            return redirect('/home');
+        }
+
+        event(new UserRequestedVerificationEmail($user));
+
+        return redirect('/login')->withInfo('Verification email resent. Please check your inbox');
     }
 ```

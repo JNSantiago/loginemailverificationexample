@@ -2,7 +2,10 @@
 
 namespace App\Listeners;
 
-use App\Events\Event;
+use Mail;
+use App\User;
+use App\Mail\SendVerificationToken;
+
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
@@ -24,8 +27,10 @@ class SendVerificationEmail
      * @param  Event  $event
      * @return void
      */
-    public function handle(Event $event)
+    public function handle($event)
     {
+        //$user = User::find($event->user->id);
+        //dd($user->verificationToken);
         Mail::to($event->user)->send(new SendVerificationToken($event->user->verificationToken));
     }
 }

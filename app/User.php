@@ -5,6 +5,8 @@ namespace App;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
+use App\VerificationToken;
+
 class User extends Authenticatable
 {
     use Notifiable;
@@ -30,5 +32,15 @@ class User extends Authenticatable
     public function verificationToken()
     {
         return $this->hasOne(VerificationToken::class);
+    }
+
+    public function hasVerifiedEmail()
+    {
+        return $this->verified;
+    }
+
+    public static function byEmail($email)
+    {
+        return static::where('email', $email);
     }
 }
